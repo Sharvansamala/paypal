@@ -13,3 +13,8 @@ public class SignUpRequest {
     private String password;
     private String adminKey;
 }
+
+
+//public record SignUpRequest(String name, String email, String password, String adminKey) {
+//
+//}
