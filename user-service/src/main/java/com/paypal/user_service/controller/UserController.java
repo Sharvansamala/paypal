@@ -1,5 +1,6 @@
 package com.paypal.user_service.controller;
 
+import com.paypal.user_service.dto.UserResponse;
 import com.paypal.user_service.entity.User;
 import com.paypal.user_service.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users/")
+@RequestMapping("/api/users")
 public class UserController {
 
     private UserService userService;
@@ -19,9 +20,9 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(User user){
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    public ResponseEntity<UserResponse> createUser(@RequestBody User user) {
+        UserResponse createdUser = userService.createUser(user);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")

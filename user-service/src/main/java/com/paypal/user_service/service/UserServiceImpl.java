@@ -1,5 +1,6 @@
 package com.paypal.user_service.service;
 
+import com.paypal.user_service.dto.UserResponse;
 import com.paypal.user_service.entity.User;
 import com.paypal.user_service.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserResponse createUser(User user) {
+        User savedUser = userRepository.save(user);
+
+        return UserResponse.builder()
+            .id(savedUser.getId())
+            .name(savedUser.getName())
+            .email(savedUser.getEmail())
+            .createdAt(savedUser.getCreatedAt())
+            .updatedAt(savedUser.getUpdatedAt())
+            .build();
     }
 
     @Override

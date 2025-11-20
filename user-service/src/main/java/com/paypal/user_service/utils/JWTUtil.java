@@ -28,8 +28,12 @@ public class JWTUtil {
     }
 
     public boolean validateToken(String token, String email) {
-        String tokenEmail = extractEmail(token);
-        return (tokenEmail.equals(email));
+        try {
+            String tokenEmail = extractEmail(token);
+            return (tokenEmail.equals(email));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String extractUsername(String token) {
@@ -41,12 +45,12 @@ public class JWTUtil {
                 .getSubject();
     }
 
-    public String generateToken(Map<String,Object> claims, String email) {
+    public String generateToken(Map<String, Object> claims, String email) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+86400000)) // 1 day
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 day
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

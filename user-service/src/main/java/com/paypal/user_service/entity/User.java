@@ -2,6 +2,7 @@ package com.paypal.user_service.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Entity

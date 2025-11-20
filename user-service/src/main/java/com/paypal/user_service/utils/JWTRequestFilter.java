@@ -24,41 +24,43 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+        String jwtToken = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwtToken = authorizationHeader.substring(7);
             try {
-                username = jwtUtil.extractUsername(token);
+                username = jwtUtil.extractUsername(jwtToken);
             } catch (Exception e) {
 
                 System.out.println("Invalid Token");
             }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            if (jwtUtil.validateToken(token, username)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(username, null, null);
+            if (jwtUtil.validateToken(jwtToken, username)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
+                        null);
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwtToken = authorizationHeader.substring(7);
+            if (jwtToken == null || jwtToken.isEmpty()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             try {
-                username = jwtUtil.extractUsername(token);
-                String role = jwtUtil.extractRole(token);
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken
-                                (username, null, List.of(new SimpleGrantedAuthority(role)));
-
+                username = jwtUtil.extractUsername(jwtToken);
+                String role = jwtUtil.extractRole(jwtToken);
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null,
+                        List.of(new SimpleGrantedAuthority(role)));
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
                 filterChain.doFilter(request, response);
             } catch (Exception e) {
-
                 System.out.println("Invalid Token");
             }
         } else {
